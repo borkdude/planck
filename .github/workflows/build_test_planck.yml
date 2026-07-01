@@ -41,7 +41,7 @@ jobs:
 
       - name: Install macOS deps
         if: runner.os == 'macOS'
-        run: brew install icu4c
+        run: brew install icu4c libzip
 
       - name: Install Linux deps
         if: runner.os == 'Linux'

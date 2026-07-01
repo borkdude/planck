@@ -7,9 +7,13 @@ fi
 if [ ! -d planck-cljs/.buildcache-$GCC_RELEASE-$GCL_RELEASE ]; then
   echo "Fetching Build Cache..."
   cd planck-cljs
-  curl --retry 3 -O -s https://planck-repl.org/releases/buildcache-$GCC_RELEASE-$GCL_RELEASE.tar || { echo "Download failed."; exit 1; }
-  tar -xf buildcache-$GCC_RELEASE-$GCL_RELEASE.tar
-  echo "Cleaning up Build Cache archive..."
-  rm buildcache-$GCC_RELEASE-$GCL_RELEASE.tar
+  # Prebuilt cache is optional and absent for new version combos. Build without it.
+  if curl --retry 3 -f -O -s https://planck-repl.org/releases/buildcache-$GCC_RELEASE-$GCL_RELEASE.tar; then
+    tar -xf buildcache-$GCC_RELEASE-$GCL_RELEASE.tar
+    echo "Cleaning up Build Cache archive..."
+    rm buildcache-$GCC_RELEASE-$GCL_RELEASE.tar
+  else
+    echo "No prebuilt build cache for this version. Building without cache."
+  fi
   cd ..
 fi

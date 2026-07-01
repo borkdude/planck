@@ -58,12 +58,13 @@ checkCmdSuccess() {
     fi
 }
 
-export GCC_RELEASE="20210808"
+# Closure compiler and library pinned to match ClojureScript 1.12.145
+export GCC_RELEASE="20250820"
 # Note CLOSURE_JS_RELEASE is no longer maintained; below is an old version
 export CLOSURE_JS_RELEASE=20190301.0.0
 script/get-closure-compiler
 
-export GCL_RELEASE="0.0-20230227-c7c0a541"
+export GCL_RELEASE="0.0-20250515-f04e4c0e"
 script/get-closure-library
 
 script/get-build-cache

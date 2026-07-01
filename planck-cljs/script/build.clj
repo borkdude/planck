@@ -13,6 +13,14 @@
 
 (def non-fatal-warnings (into #{:redef} experimental-warnings))
 
+;; ClojureScript 1.12 analyzer.api self-compiles to a benign cljs.core/class warning. Do not fail on it.
+(defn non-fatal-warning?
+  [warning-type extra]
+  (or (contains? non-fatal-warnings warning-type)
+      (and (= :undeclared-var warning-type)
+           (= 'cljs.core (:prefix extra))
+           (= 'class (:suffix extra)))))
+
 (defn delete-recursively [fname]
   (doseq [f (reverse (file-seq (io/file fname)))]
     (io/delete-file f true)))
@@ -23,7 +31,7 @@
        (when-let [s (cljs.analyzer/error-message warning-type extra)]
          (binding [*out* *err*]
            (println "WARNING:" (cljs.analyzer/message env s)))
-         (when-not (warning-type non-fatal-warnings)
+         (when-not (non-fatal-warning? warning-type extra)
            (System/exit 1)))))]
   (api/build (api/inputs "src")
     {:output-dir         "out"

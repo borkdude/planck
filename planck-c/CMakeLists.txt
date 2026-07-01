@@ -106,7 +106,16 @@ endif(APPLE)
 
 if(APPLE)
    add_definitions(-DU_DISABLE_RENAMING)
-   include_directories(/usr/local/opt/icu4c/include)
+   # icu4c is keg-only and its prefix differs by arch (/opt/homebrew vs /usr/local). Ask brew.
+   execute_process(COMMAND brew --prefix icu4c
+                   OUTPUT_VARIABLE ICU4C_PREFIX
+                   OUTPUT_STRIP_TRAILING_WHITESPACE
+                   ERROR_QUIET)
+   if(ICU4C_PREFIX)
+      include_directories(${ICU4C_PREFIX}/include)
+   else()
+      include_directories(/usr/local/opt/icu4c/include)
+   endif()
    find_library(ICU4C icucore)
    target_link_libraries(planck ${ICU4C})
 elseif(UNIX)

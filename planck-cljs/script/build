@@ -4,12 +4,27 @@ if [ "${VERBOSE_BUILD:-0}" == "1" ]; then
   set -x
 fi
 
-if [ ! -f jscomp.js ]; then
-  curl -s -O https://planck-repl.org/releases/closure-${CLOSURE_JS_RELEASE}/jscomp.js
+# Foreign libs fetched from npm: the planck-repl.org release assets are gone.
+if [ ! -s jscomp.js ]; then
+  echo "Fetching jscomp.js from npm..."
+  tgz=`mktemp`
+  curl -f -sS -o "$tgz" https://registry.npmjs.org/google-closure-compiler-js/-/google-closure-compiler-js-${CLOSURE_JS_RELEASE}.tgz || { echo "Download of jscomp.js failed."; exit 1; }
+  tar -xzOf "$tgz" package/jscomp.js > jscomp.js
+  rm -f "$tgz"
+  [ -s jscomp.js ] || { echo "Extraction of jscomp.js failed."; exit 1; }
 fi
 
-if [ ! -f paredit.js ]; then
-  curl -s -O https://planck-repl.org/releases/paredit-${PAREDIT_JS_RELEASE}/paredit.js
+if [ ! -s paredit.js ]; then
+  echo "Fetching paredit.js from npm..."
+  tgz=`mktemp`
+  curl -f -sS -o "$tgz" https://registry.npmjs.org/paredit.js/-/paredit.js-${PAREDIT_JS_RELEASE}.tgz || { echo "Download of paredit.js failed."; exit 1; }
+  {
+    echo "// Alias window to the global object for JavaScriptCore."
+    echo "var window = window || this;"
+    tar -xzOf "$tgz" package/paredit-bundle.js
+  } > paredit.js
+  rm -f "$tgz"
+  [ -s paredit.js ] || { echo "Extraction of paredit.js failed."; exit 1; }
 fi
 
 # Make sure we fail and exit on the command that actually failed.

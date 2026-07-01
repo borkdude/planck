@@ -19,7 +19,7 @@ jobs:
         include:
           - os: macos-14
             asset: planck-macos-arm64
-          - os: macos-13
+          - os: macos-15-intel
             asset: planck-macos-x64
           - os: ubuntu-22.04
             asset: planck-linux-x64
